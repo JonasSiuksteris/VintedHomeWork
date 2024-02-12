@@ -10,3 +10,6 @@ Components of solution:
 To make code more decoupled it is possible to introduce TransactionProcessor and OutputService and extract the logic out of them.
 
 With this version only tested the crucial business logic components of the application
+
+To run app navigate to VintedHomeWork/Vinted_Assignment/ and run "dotnet run"
+To run tests navigate to VintedHomeWork/Vinted_Assignment_Tests/ and run "dotnet test"
