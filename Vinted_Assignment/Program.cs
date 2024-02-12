@@ -13,7 +13,7 @@ public static class Program
     
     public static void Main(string[] args)
     {
-        _fileReader = new FileReader.FileReader("../../../input.txt");
+        _fileReader = new FileReader.FileReader("input.txt");
         
         _dataStore = new ListDataStore();
         
