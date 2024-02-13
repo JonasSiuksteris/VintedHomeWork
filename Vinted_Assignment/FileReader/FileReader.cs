@@ -1,4 +1,3 @@
-using Vinted_Assignment.Errors;
 using Vinted_Assignment.Models;
 
 namespace Vinted_Assignment.FileReader;
@@ -19,14 +18,14 @@ public class FileReader : IDisposable
     }
 
     //This implementation assumes that data will be provided without any empty lines and only defined providers are given
-    public Transaction GetTransaction()
+    public ParsingResult GetTransaction()
     {
         var rawLine = _streamReader.ReadLine();
         var parsedLine = rawLine?.Split(new []{' '}, StringSplitOptions.RemoveEmptyEntries);
 
         if (parsedLine is not { Length: 3 })
         {   
-            throw new DataInputException($"{rawLine}");
+            return ParsingResult.Failure($"Invalid format: {rawLine}", rawLine);
         }
         
         var date = DateTime.ParseExact(parsedLine[0], "yyyy-MM-dd", null);
@@ -35,10 +34,10 @@ public class FileReader : IDisposable
 
         if (!isProviderParsed || !isPackageSizeParsed)
         {
-            throw new DataInputException($"{rawLine}"); 
+            return ParsingResult.Failure($"Invalid data in line: {rawLine}", rawLine);
         }
         
-        return new Transaction(date, packageSize, provider);
+        return ParsingResult.Success(new Transaction(date, packageSize, provider)); 
     }
 
     public void Dispose()

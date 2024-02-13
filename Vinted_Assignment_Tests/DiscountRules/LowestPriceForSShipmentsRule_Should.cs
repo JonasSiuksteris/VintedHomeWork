@@ -1,8 +1,6 @@
 using AutoFixture.Xunit2;
-using Moq;
 using Vinted_Assignment.DiscountRules;
 using Vinted_Assignment.Models;
-using Vinted_Assignment.Storage;
 using Xunit;
 
 namespace Vinted_Assignment_Tests.DiscountRules;

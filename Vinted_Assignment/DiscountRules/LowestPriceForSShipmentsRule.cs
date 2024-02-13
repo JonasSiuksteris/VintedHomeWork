@@ -1,6 +1,5 @@
 using Vinted_Assignment.Helpers;
 using Vinted_Assignment.Models;
-using Vinted_Assignment.Storage;
 
 namespace Vinted_Assignment.DiscountRules;
 

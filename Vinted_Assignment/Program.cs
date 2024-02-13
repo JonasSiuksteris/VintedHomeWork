@@ -1,5 +1,4 @@
 ﻿using Vinted_Assignment.DiscountRules;
-using Vinted_Assignment.Errors;
 using Vinted_Assignment.Helpers;
 using Vinted_Assignment.Storage;
 
@@ -8,8 +7,8 @@ namespace Vinted_Assignment;
 public static class Program
 {
     private static FileReader.FileReader _fileReader;
+    private static TransactionProcessor.TransactionProcessor _transactionProcessor;
     private static IDataStore _dataStore;
-    private static RulesProcessor.RulesProcessor _rulesProcessor;
     
     public static void Main(string[] args)
     {
@@ -17,10 +16,12 @@ public static class Program
         
         _dataStore = new ListDataStore();
         
-        _rulesProcessor = new RulesProcessor.RulesProcessor();
-        _rulesProcessor.AddRule(new LowestPriceForSShipmentsRule());
-        _rulesProcessor.AddRule(new FirstThirdLShipmentForLpFreeRule(_dataStore));
-        _rulesProcessor.AddRule(new MaximumDiscountPerMonthRule(_dataStore));
+        var rulesProcessor = new RulesProcessor.RulesProcessor();
+        rulesProcessor.AddRule(new LowestPriceForSShipmentsRule());
+        rulesProcessor.AddRule(new FirstThirdLShipmentForLpFreeRule(_dataStore));
+        rulesProcessor.AddRule(new MaximumDiscountPerMonthRule(_dataStore));
+
+        _transactionProcessor = new TransactionProcessor.TransactionProcessor(rulesProcessor);
         
         while (!_fileReader.IsEndOfFile())
         {
@@ -30,20 +31,16 @@ public static class Program
 
     private static void ProcessNextTransaction()
     {
-        try
-        {
-            var transaction = _fileReader.GetTransaction();
-            transaction.FinalShipmentPrice = PriceLookup.GetPrice(transaction.Provider, transaction.PackageSize);
-            var discount = _rulesProcessor.ExecuteRules(transaction);
-            transaction.FinalShipmentPrice -= discount;
-                
-            Console.WriteLine($"{transaction.Date:yyyy-MM-dd} {transaction.PackageSize} {transaction.Provider} {transaction.FinalShipmentPrice} {(discount != 0 ? discount : "-")}");
+        var parsingResult = _fileReader.GetTransaction();
 
-            _dataStore.Save(transaction);
-        }
-        catch (DataInputException e)
+        if (!parsingResult.IsSuccess)
         {
-            Console.WriteLine(e.Message + " " + "Ignored");
+            ConsoleWriter.WriteFailure(parsingResult.RawLine!);
+            return;
         }
+        
+        var processedTransaction = _transactionProcessor.ProcessTransaction(parsingResult.Transaction!);
+        _dataStore.Save(processedTransaction);
+        ConsoleWriter.WriteSuccess(processedTransaction);
     }
 }

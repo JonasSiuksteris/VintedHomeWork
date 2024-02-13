@@ -14,7 +14,7 @@ public class PriceLookup_Should
     [InlineData(Provider.MR, PackageSize.S, 2)]
     [InlineData(Provider.MR, PackageSize.M, 3)]
     [InlineData(Provider.MR, PackageSize.L, 4)]
-    public void GetDiscount_WhenItsThird(
+    public void GetPrice(
         Provider provider,
         PackageSize packageSize,
         decimal correctPrice)
@@ -31,7 +31,6 @@ public class PriceLookup_Should
     {
         //Execute
         var price = PriceLookup.GetLowestPriceForSSize();
-        
         
         //Assert
         Assert.Equal(1.5m, price);

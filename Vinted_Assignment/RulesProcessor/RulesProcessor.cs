@@ -3,7 +3,7 @@ using Vinted_Assignment.Models;
 
 namespace Vinted_Assignment.RulesProcessor;
 
-public class RulesProcessor
+public class RulesProcessor : IRuleProcessor
 {
     private readonly List<IDiscountRule> _rules = [];
 
